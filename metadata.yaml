@@ -1,0 +1,7 @@
+name: "auto-generated-pkg-8eacc0d4-fcf6-4f59-9531-6635f42d6197"
+productVersion: "7.0.1-SNAPSHOT"
+data:
+- locator: "software-component/Software.LinuxEPOAgent.yaml"
+  name: "LinuxEPO Agent"
+  description: "Linux 64-bit EPO Agent"
+exportTime: "2017-02-14T20:18:37.131Z"

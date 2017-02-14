@@ -1,0 +1,231 @@
+'@type': "SoftwareComponentType"
+createdDate: "2017-02-13T21:54:56.348Z"
+lastUpdated: "2017-02-14T20:18:25.161Z"
+id: "Software.LinuxEPOAgent"
+name: "LinuxEPO Agent"
+description: "Linux 64-bit EPO Agent"
+publishStatus: "PUBLISHED"
+publishStatusName: "Published"
+schema:
+  fields:
+  - id: "RPMWEBSERVER"
+    label: "RPMWEBSERVER"
+    description: "Address and path (but not filename) of RPM"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "http://controlcenter.corp.local/"
+    isMultiValued: false
+  - id: "SERVERSSLPORT"
+    label: "SERVERSSLPORT"
+    description: "SSL Port"
+    dataType:
+      type: "primitive"
+      typeId: "INTEGER"
+    state:
+      dependencies: []
+      facets:
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "integer"
+            value: 443
+    isMultiValued: false
+  - id: "SERVERIP"
+    label: "SERVERIP"
+    description: "End Point Operations Server IP Address"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "vrops-01a.corp.local"
+    isMultiValued: false
+  - id: "SERVERLOGIN"
+    label: "SERVERLOGIN"
+    description: "Login Name"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "admin"
+    isMultiValued: false
+  - id: "SERVERCERTIFICATETHUMBPRINT"
+    label: "SERVERCERTIFICATETHUMBPRINT"
+    description: "Server Certificate Thumbprint"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: ""
+    isMultiValued: false
+  - id: "host"
+    label: "Container"
+    description: ""
+    dataType:
+      type: "ref"
+      componentTypeId: "com.vmware.csp.iaas.blueprint.service"
+      classId: "Infrastructure.Machine.Schema"
+      label: "Machine"
+    state:
+      dependencies: []
+      facets:
+      - type: "visible"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: false
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+      - type: "internal"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+  - id: "SERVERPWORD"
+    label: "SERVERPWORD"
+    description: "Server Password"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "encrypted"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: false
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "VMware1!"
+    isMultiValued: false
+  - id: "RPMNAME"
+    label: "RPMNAME"
+    description: "Name of EPOPS RPM file"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "vRealize-Endpoint-Operations-Management-Agent-x86-64-linux-6.4.0-4536552.rpm"
+    isMultiValued: false
+containerFieldId: "host"
+lifecycleTasks:
+- createdDate: "2017-02-13T21:54:56.352Z"
+  lastUpdated: "2017-02-14T20:18:25.161Z"
+  script:
+    scriptContent: "#!/bin/bash\ncd /tmp\nif [ ! -e \"$RPMNAME\" ] ; then \n  wget\
+      \ $RPMWEBSERVER/$RPMNAME\nfi\nrpm -i /tmp/$RPMNAME"
+    isRebootAfter: false
+    scriptTypeId: "Bash"
+  taskDescriptorRef:
+    id: "INSTALL"
+    label: "Install"
+- createdDate: "2017-02-14T16:05:16.128Z"
+  lastUpdated: "2017-02-14T20:18:25.161Z"
+  script:
+    scriptContent: "#!/bin/bash\n/sbin/service epops-agent start\n/sbin/chkconfig\
+      \ epops-agent on"
+    isRebootAfter: false
+    scriptTypeId: "Bash"
+  taskDescriptorRef:
+    id: "START"
+    label: "Start"
+- createdDate: "2017-02-13T21:54:56.351Z"
+  lastUpdated: "2017-02-14T20:18:25.161Z"
+  script:
+    scriptContent: "#!/bin/bash\necho \"starting configuration, updating agent.properties\
+      \ file...\"\nsed -i \"s/#agent.setup.serverIP=localhost/agent.setup.serverIP=$SERVERIP/\"\
+      \ /opt/vmware/epops-agent/conf/agent.properties\nsed -i \"s/#agent.setup.serverSSLPort=443/agent.setup.serverSSLPort=$SERVERSSLPORT/\"\
+      \ /opt/vmware/epops-agent/conf/agent.properties\nsed -i \"s/#agent.setup.serverLogin=username/agent.setup.serverLogin=$SERVERLOGIN/\"\
+      \ /opt/vmware/epops-agent/conf/agent.properties\nsed -i \"s/#agent.setup.serverPword=password/agent.setup.serverPword=$SERVERPWORD/\"\
+      \ /opt/vmware/epops-agent/conf/agent.properties\nsed -i \"s/#agent.setup.serverCertificateThumbprint=/agent.setup.serverCertificateThumbprint=$SERVERCERTIFICATETHUMBPRINT/\"\
+      \ /opt/vmware/epops-agent/conf/agent.properties\necho \"Configuration complete\""
+    isRebootAfter: false
+    scriptTypeId: "Bash"
+  taskDescriptorRef:
+    id: "CONFIGURE"
+    label: "Configure"
